@@ -4,16 +4,11 @@ services:
       context: server
     ports:
       - 8000:8000
-    # depends_on:
-    #   client:
-    #     condition: service_healthy
+    depends_on:
+      client:
+        condition: service_healthy
   client:
     build:
       context: client
     ports:
       - 8001:80
-    # healthcheck:
-    #   test: ["CMD", "curl", "-f", "http://localhost:8001"]
-    #   interval:  15s
-    #   timeout:  10s
-    #   retries:  5
