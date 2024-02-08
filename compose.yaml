@@ -4,11 +4,47 @@ services:
       context: server
     ports:
       - 8000:8000
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: root
+    networks:
+      - db_network
     depends_on:
       client:
+        condition: service_healthy
+      database:
         condition: service_healthy
   client:
     build:
       context: client
     ports:
       - 8001:80
+  database:
+    image: mongo
+    restart: always
+    command: mongod --quiet --bind_ip_all
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: root
+      MONGO_INITDB_DATABASE: db
+    expose:
+      - 8002:27017
+    volumes:
+      - mongodb_data:/data/db
+      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    networks:
+      - db_network
+    healthcheck:
+      test: ["CMD", "echo", "'db.runCommand(\"ping\").ok'", "|", "mongo", "mongodb://admin:root@localhost:27017/admin", "--quiet"]
+      interval:  10s
+      timeout:  5s
+      retries:  3
+
+
+networks:
+  db_network:
+    driver: bridge
+
+
+volumes:
+  mongodb_data:
