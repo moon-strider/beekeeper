@@ -1,5 +1,9 @@
 # BeeKeeper
 
+## Project scheme
+
+![Project scheme](misc/images/project_scheme.png)
+
 ## Launch
 
 - From the root directory of the repository: `docker-compose up --build`
